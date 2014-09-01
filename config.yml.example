@@ -1,5 +1,7 @@
 jid: your-gmail-name@gmail.com
 password: your-password
+areadesc: Stadt Münster
+bbox: 51.94,7.61,51.97,7.64
 send_to:
  - person1-you-want-to-send-to@gmail.com
  - person2-you-want-to-send-to@gmail.com

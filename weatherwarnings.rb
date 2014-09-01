@@ -8,16 +8,17 @@ require 'blather/client'
 
 @config = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'config.yml'))
 
-def get_warning(areadesc: "Stadt Münster", time_format: "%H:%M", date_format: "%-e.%-m.%Y", url: "http://maps.dwd.de/geoserver/ows?service=wfs&version=2.0.0&request=GetFeature&typename=dwd:BASISWARNUNGEN&bbox=51.94,7.61,51.97,7.64", num_retrys: 5, wait_time_seconds: 10)
+def get_warning(areadesc: @config['areadesc'], time_format: "%H:%M", date_format: "%-e.%-m.%Y", num_retrys: 5, wait_time_seconds: 10)
   wanted_attributes = %w(HEADLINE DESCRIPTION EXPIRES ONSET IDENTIFIER)
   time_format_full = "#{time_format} #{date_format}"
+  url = "http://maps.dwd.de/geoserver/ows?service=wfs&version=2.0.0&request=GetFeature&typename=dwd:BASISWARNUNGEN"
+  url << "&bbox=#{@config['bbox']}" unless @config['bbox'] == nil
 
   begin
     tries ||= num_retrys
     doc = Nokogiri::XML(open(url))
     area = doc.xpath("//wfs:member/dwd:BASISWARNUNGEN/dwd:AREADESC[text()='#{areadesc}']/..")
   rescue *[Nokogiri::XML::XPath::SyntaxError, Errno::ENOENT] => e
-    log "error #{e}"
     sleep wait_time_seconds
     retry unless (tries -= 1).zero?
     "error after #{num_retrys} retries: #{e}"
