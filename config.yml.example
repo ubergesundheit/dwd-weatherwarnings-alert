@@ -1,0 +1,5 @@
+jid: your-gmail-name@gmail.com
+password: your-password
+send_to:
+ - person1-you-want-to-send-to@gmail.com
+ - person2-you-want-to-send-to@gmail.com
