@@ -31,9 +31,10 @@ def get_warning(areadesc: @config['areadesc'], time_format: "%H:%M", date_format
     end
     warning[:expires] = Time.parse warning[:expires]
     warning[:onset] = Time.parse warning[:onset]
+    binding.pry
 
     unless compare_saved_warning warning
-      "Von #{warning[:onset].strftime time_format_full} bis #{warning[:expires].strftime time_format_full} #{warning[:headline]}: #{warning[:description]}"
+      "Von #{warning[:onset].localtime.strftime time_format_full} bis #{warning[:expires].localtime.strftime time_format_full} #{warning[:headline]}: #{warning[:description]}"
     end
   end
 end
@@ -47,7 +48,7 @@ def compare_saved_warning(warning)
 
       file.read.split(',').zip(persistence_items).each do |saved_item, warning_key|
         key = warning_key.to_sym
-        saved_warning[key] = saved_item 
+        saved_warning[key] = saved_item
         saved_warning[key] = Time.parse saved_warning[key] unless warning_key == 'identifier'
       end
       # the file is empty.. write a new one.
