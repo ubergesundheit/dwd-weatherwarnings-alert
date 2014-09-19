@@ -40,16 +40,16 @@ def get_warning(areadesc: @config['areadesc'], time_format: "%H:%M", date_format
 end
 
 def compare_saved_warning(warning)
-  persistence_items = %w{identifier onset expires}
+  persistence_items = %w{description onset expires}
   filename = 'saved_warning'
   begin
     File.open( File.join(File.dirname(File.expand_path(__FILE__)), filename), 'r+') do |file|
       saved_warning = {}
 
-      file.read.split(',').zip(persistence_items).each do |saved_item, warning_key|
+      file.read.split('@@@').zip(persistence_items).each do |saved_item, warning_key|
         key = warning_key.to_sym
         saved_warning[key] = saved_item
-        saved_warning[key] = Time.parse saved_warning[key] unless warning_key == 'identifier'
+        saved_warning[key] = Time.parse saved_warning[key] unless warning_key == 'description'
       end
       # the file is empty.. write a new one.
       raise Errno::ENOENT if saved_warning == {}
@@ -60,7 +60,7 @@ def compare_saved_warning(warning)
 
       # are the saved warning identifier and current identifier the same?
       # is the onset changed?
-      if warning[:identifier] != saved_warning[:identifier] or warning[:onset] != saved_warning[:onset]
+      if warning[:description] != saved_warning[:description] or warning[:onset] != saved_warning[:onset]
         raise Errno::ENOENT # also return false
       end
 
@@ -69,7 +69,7 @@ def compare_saved_warning(warning)
     end
   rescue Errno::ENOENT
     File.open( File.join(File.dirname(File.expand_path(__FILE__)), filename), 'w') do |file|
-      file.write(persistence_items.map { |item| warning[item.to_sym] }.join(','))
+      file.write(persistence_items.map { |item| warning[item.to_sym] }.join('@@@'))
     end
     false
   end
